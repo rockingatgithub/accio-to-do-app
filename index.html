@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <main>
+    <div>Todo App</div>
+
+    <!-- create task section -->
+    <div id="create-task-box" >
+        <input id="task-name" type="text"  /> <input id="task-date" type="date"  />    <button id="create-task" onclick="addTaskHandler()" > Add Task </button>
+    </div>
+
+    <!-- diplaying the list -->
+
+    <ul id="tasks-list-box" >
+
+    </ul>
+
+
+
+
+</main>
+    
+    <script>
+
+        //create element
+        // append child
+
+        // adding a item
+
+        function addTaskHandler () {
+            let newTaskName = document.getElementById("task-name").value;
+            let newTaskDate = document.getElementById("task-date").value;
+
+            let newTaskItem = document.createElement("li");
+            newTaskItem.innerHTML = `<span> ${newTaskName} </span> <span> ${ newTaskDate } </span> <button onclick="editTask(event)" > Edit </button> <button onclick="deleteTask(event)" > X </button>  `;
+
+            document.getElementById("tasks-list-box").append(newTaskItem);
+
+        }
+
+        // deleting a item
+
+        function deleteTask (event) {
+            let parentNodeOfItem = event.target.parentNode
+            console.log(parentNodeOfItem);
+
+            if(parentNodeOfItem) {
+                parentNodeOfItem.remove();
+            }
+
+        }
+
+        // updating an item
+
+        function editTask (event) {
+
+            let currentItem = event.target.parentNode;
+            let currentItemTaskName = currentItem.children[0];
+            let currentItemTaskDate = currentItem.children[1];
+
+
+            
+
+            currentItem.innerHTML = `<span> ${currentItem.children[0].innerText} </span>
+             <span> ${ currentItem.children[1].innerText } </span> 
+             <input id="current-task-name" type="text" placeholder=${currentItemTaskName.innerText}  /> 
+             <input id="current-task-date" type="date" placeholder=${currentItemTaskDate.innerText} /> 
+              <button onclick="saveTask(event)" > Save </button> 
+              <button onclick="deleteTask(event)" > X </button> `
+
+            currentItemTaskName = currentItem.children[0];
+            currentItemTaskDate = currentItem.children[1];
+
+            currentItemTaskName.style.display = 'none';
+            currentItemTaskDate.style.display = 'none';
+
+
+        }
+
+        function saveTask (event) {
+            let currentItem = event.target.parentNode;
+
+            let currentItemTaskName = currentItem.children[0];
+            let currentItemTaskDate = currentItem.children[1];
+
+            let editedTaskName = currentItem.children[2];
+            let editedTaskDate = currentItem.children[3];
+
+            currentItemTaskName.innerText = editedTaskName.value;
+            currentItemTaskDate.innerText = editedTaskDate.value;
+
+            editedTaskDate.remove();
+            editedTaskName.remove();
+
+
+            currentItemTaskName.style.display = 'inline';
+            currentItemTaskDate.style.display = 'inline';
+
+            currentItem.children[2].setAttribute("onclick", "editTask(event)");
+            currentItem.children[2].innerText ="Edit";
+
+
+        }
+
+
+
+    </script>
+
+</body>
+</html>
