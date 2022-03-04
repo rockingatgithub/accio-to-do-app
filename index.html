@@ -6,14 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
-<body>
+<body onload="updateTasks()" >
 
     <main>
     <div>Todo App</div>
 
     <!-- create task section -->
     <div id="create-task-box" >
-        <input id="task-name" type="text"  /> <input id="task-date" type="date"  />    <button id="create-task" onclick="addTaskHandler()" > Add Task </button>
+        <input id="task-name" type="text"  /> <input id="task-date" type="date"  />    <button id="create-task" onclick="addTaskHandler()" > Add Task </button>  <button onclick="deleteMultipleTasksHandler()" > Delete Selected </button>
+    </div>
+
+    <div id="search-task-box">
+        <input type="text" id="task-search"  /> <button id="search-button" onclick="searchTaskHandler()">Search</button>
     </div>
 
     <!-- diplaying the list -->
@@ -22,8 +26,9 @@
 
     </ul>
 
+    <ul id="searched-tasks">
 
-
+    </ul>
 
 </main>
     
@@ -32,6 +37,44 @@
         //create element
         // append child
 
+        let storedTasks = [];
+        storedTasks = JSON.parse(localStorage.getItem('tasksList')) || [];
+
+
+        function updateTasks () {
+            storedTasks.forEach(task => {
+            let newTaskName = task.title;
+            let newTaskDate = task.date;
+
+            let newTaskItem = document.createElement("li");
+            newTaskItem.innerHTML = `<span> ${newTaskName} </span> <span> ${ newTaskDate } </span> <button onclick="editTask(event)" > Edit </button> <button onclick="deleteTask(event)" > X </button> <input class="task-checkbox" type="checkbox" />  `;
+
+            document.getElementById("tasks-list-box").append(newTaskItem);
+            })
+        }
+
+
+        function updateStorage () {
+            let tasksArray = [];
+
+            let Tasks = document.getElementsByTagName("li");
+
+           let TasksList = Array.from(Tasks);
+           TasksList.forEach(Element => {
+               let obj = {};
+               obj.title = Element.children[0].innerText;
+               obj.date = Element.children[1].innerText;
+
+               tasksArray.push(obj);
+           })
+
+           localStorage.setItem('tasksList', JSON.stringify(tasksArray));
+
+           storedTasks = JSON.parse(localStorage.getItem('tasksList'));
+
+        }
+
+
         // adding a item
 
         function addTaskHandler () {
@@ -39,9 +82,11 @@
             let newTaskDate = document.getElementById("task-date").value;
 
             let newTaskItem = document.createElement("li");
-            newTaskItem.innerHTML = `<span> ${newTaskName} </span> <span> ${ newTaskDate } </span> <button onclick="editTask(event)" > Edit </button> <button onclick="deleteTask(event)" > X </button>  `;
+            newTaskItem.innerHTML = `<span> ${newTaskName} </span> <span> ${ newTaskDate } </span> <button onclick="editTask(event)" > Edit </button> <button onclick="deleteTask(event)" > X </button> <input class="task-checkbox" type="checkbox" />  `;
 
             document.getElementById("tasks-list-box").append(newTaskItem);
+
+            updateStorage();
 
         }
 
@@ -55,6 +100,7 @@
                 parentNodeOfItem.remove();
             }
 
+            updateStorage();
         }
 
         // updating an item
@@ -73,7 +119,8 @@
              <input id="current-task-name" type="text" placeholder=${currentItemTaskName.innerText}  /> 
              <input id="current-task-date" type="date" placeholder=${currentItemTaskDate.innerText} /> 
               <button onclick="saveTask(event)" > Save </button> 
-              <button onclick="deleteTask(event)" > X </button> `
+              <button onclick="deleteTask(event)" > X </button> 
+              <input class="task-checkbox" type="checkbox" />`
 
             currentItemTaskName = currentItem.children[0];
             currentItemTaskDate = currentItem.children[1];
@@ -81,8 +128,11 @@
             currentItemTaskName.style.display = 'none';
             currentItemTaskDate.style.display = 'none';
 
-
+            updateStorage();
         }
+
+
+        // saving a task after edit
 
         function saveTask (event) {
             let currentItem = event.target.parentNode;
@@ -106,9 +156,42 @@
             currentItem.children[2].setAttribute("onclick", "editTask(event)");
             currentItem.children[2].innerText ="Edit";
 
-
+            updateStorage();
         }
 
+
+        //deleting multiple tasks at once .............
+
+        function deleteMultipleTasksHandler () {
+            let selectedTasks = document.querySelectorAll(".task-checkbox");
+
+            selectedTasks.forEach(Element => {
+                if(Element.checked) {
+                    Element.parentNode.remove();
+                }
+            });
+
+            updateStorage();
+        } 
+
+        // searching task
+
+        function searchTaskHandler () {
+            let serachText = document.getElementById("task-search").value;
+
+            let resultTasks =  storedTasks.filter((task) => task.title.toLowerCase().substring(0, serachText.length) === serachText);
+
+            resultTasks.forEach(task => {
+            let newTaskName = task.title;
+            let newTaskDate = task.date;
+
+            let newTaskItem = document.createElement("li");
+            newTaskItem.innerHTML = `<span> ${newTaskName} </span> <span> ${ newTaskDate } </span> `;
+
+            document.getElementById("searched-tasks").append(newTaskItem);
+            })
+
+        }
 
 
     </script>
